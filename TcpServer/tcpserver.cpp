@@ -22,7 +22,12 @@ std::string gps::server::tcpserver::read()
 
 void gps::server::tcpserver::sync()
 {
-
+	std::string res;
+	for (;;) {
+		res = gps_connection.read();
+		if (res.length() == 0) break;
+		message_queue.push_back(res);
+	}
 }
 
 gps::server::tcpserver::tcpserver(const unsigned short portnum) : _socket(tcp::socket(_io_service, tcp::v4())), _portnum(portnum)
@@ -45,6 +50,7 @@ bool gps::server::tcpserver::listen()
 		if (from_client != "OK") return false;
 		for (;;) {
 			// READ DATA FROM GPS
+			sync();
 			std::this_thread::sleep_for(std::chrono::seconds(5));
 			// Empty queue
 			if (message_queue.size() > 0) {
