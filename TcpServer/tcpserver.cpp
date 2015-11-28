@@ -65,9 +65,9 @@ bool gps::server::tcpserver::listen()
 				while (!message_queue.empty()) {
 					auto msg = message_queue.front();
 					boost::asio::write(_socket, boost::asio::buffer(msg, msg.length()));
-					auto from_client = read(_socket);
-					std::cout << "Receiv: " << from_client << "\n";
-					if (from_client != "OK") return false;
+					//auto from_client = read(_socket);
+					//std::cout << "Receiv: " << from_client << "\n";
+					//if (from_client != "OK") return false;
 					message_queue.pop_front();
 				}
 			} else {
