@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 
-std::string gps::server::tcpserver::read()
+std::string gps::server::tcpserver::read(tcp::socket& _socket)
 {
 	std::string result;
 	char data[max_length];
@@ -30,9 +30,8 @@ void gps::server::tcpserver::sync()
 	}
 }
 
-gps::server::tcpserver::tcpserver(boost::asio::io_service& ios, const unsigned short portnum) :_portnum(portnum)
+gps::server::tcpserver::tcpserver(boost::asio::io_service& ios, const unsigned short portnum) :_io_service(ios),_portnum(portnum)
 {
-	_io_service = ios;
 }
 
 gps::server::tcpserver::~tcpserver()
@@ -48,7 +47,7 @@ bool gps::server::tcpserver::listen()
 		tcp::socket _socket(_io_service);
 		_acceptor.accept(_socket);
 		
-		auto from_client = read();
+		auto from_client = read(_socket);
 		if (from_client != "OK") return false;
 		for (;;) {
 			// READ DATA FROM GPS
@@ -59,13 +58,13 @@ bool gps::server::tcpserver::listen()
 				while (message_queue.size() != 0) {
 					auto msg = message_queue.front();
 					boost::asio::write(_socket, boost::asio::buffer(msg, msg.length()));
-					from_client = read();
+					from_client = read(_socket);
 					if (from_client != "OK") return false;
 					message_queue.pop_front();
 				}
 			} else {
 				boost::asio::write(_socket, boost::asio::buffer(empty_queue, empty_queue.length()));
-				from_client = read();
+				from_client = read(_socket);
 				if (from_client != "OK") return false;
 			}
 		}

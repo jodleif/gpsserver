@@ -19,7 +19,7 @@ namespace gps
 			uart_conn gps_connection;
 			static const size_t max_length = 128;
 			const unsigned short _portnum;
-			std::string read();
+			std::string read(tcp::socket& _socket);
 			void sync();
 		public:
 			tcpserver(boost::asio::io_service& ios, const unsigned short portnum);
