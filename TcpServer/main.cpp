@@ -5,8 +5,7 @@
 int main()
 {
 	std::cout << "Test driver / entry point for tcpserver\n";
-	boost::asio::io_service ios;
-	gps::server::tcpserver server(ios, 1234);
+	gps::server::tcpserver server(1234);
 	server.listen();
 	return 0;
 }

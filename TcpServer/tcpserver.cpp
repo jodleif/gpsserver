@@ -30,7 +30,7 @@ void gps::server::tcpserver::sync()
 	}
 }
 
-gps::server::tcpserver::tcpserver(boost::asio::io_service& ios, const unsigned short portnum) :_io_service(ios),_portnum(portnum)
+gps::server::tcpserver::tcpserver(const unsigned short portnum) : _portnum(portnum)
 {
 	_io_service.run();
 }

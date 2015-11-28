@@ -22,7 +22,7 @@ namespace gps
 			std::string read(tcp::socket& _socket);
 			void sync();
 		public:
-			tcpserver(boost::asio::io_service& ios, const unsigned short portnum);
+			tcpserver(const unsigned short portnum);
 			~tcpserver();
 			bool listen();
 		};
