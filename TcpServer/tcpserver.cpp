@@ -30,8 +30,9 @@ void gps::server::tcpserver::sync()
 	}
 }
 
-gps::server::tcpserver::tcpserver(const unsigned short portnum) : _socket(tcp::socket(_io_service, tcp::v4())), _portnum(portnum)
+gps::server::tcpserver::tcpserver(boost::asio::io_service& ios, const unsigned short portnum) :_portnum(portnum)
 {
+	_io_service = ios;
 }
 
 gps::server::tcpserver::~tcpserver()
@@ -44,6 +45,7 @@ bool gps::server::tcpserver::listen()
 	try {
 
 		tcp::acceptor _acceptor(_io_service, tcp::endpoint(tcp::v4(), _portnum));
+		tcp::socket _socket(_io_service);
 		_acceptor.accept(_socket);
 		
 		auto from_client = read();
