@@ -26,15 +26,15 @@ std::string gps::server::tcpserver::read(tcp::socket& _socket)
 
 void gps::server::tcpserver::sync()
 {
-	/*std::string res;
+	std::string res;
+	char counter{ 0 };
 	for (;;) {
 		res = gps_connection.read();
 		if (res.length() == 0) break;
+		++counter;
+		if (counter == 10) break;
 		message_queue.push_back(res);
-	}*/
-	std::string test{ "LOL\r\n" };
-	message_queue.push_back(test);
-	message_queue.push_back(test);
+	}
 }
 
 gps::server::tcpserver::tcpserver(const unsigned short portnum) : _portnum(portnum)
