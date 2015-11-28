@@ -3,14 +3,14 @@
 #include <string>
 #include <cstdint>
 #include <deque>
-#include "uart/cppwrapper.h"
+//#include "uart/cppwrapper.h"
 namespace gps
 {
 	namespace server
 	{
 		// using
 		using boost::asio::ip::tcp;
-		using gps::c_link::uart_conn;
+		//using gps::c_link::uart_conn;
 		const std::string empty_queue ="Empty queue\n";
 		class tcpserver
 		{
