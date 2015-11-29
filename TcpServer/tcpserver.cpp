@@ -28,17 +28,16 @@ void gps::server::tcpserver::start_thread()
 		std::string res;
 		for (;;) {
 			if (connected) break;
-			lock.lock();
-			res = gps_connection.read();
-			if (message_queue.size() <= 1024u) {
+			if (message_queue.size() <= 128u) {
+				lock.lock();
+				res = gps_connection.read();
 				message_queue.push_back(res);
 				lock.unlock();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
 			} else {
-				lock.unlock();
 				std::cout << "buffer full.. sleeeep\n";
-				std::this_thread::sleep_for(std::chrono::seconds(100));
+				std::this_thread::sleep_for(std::chrono::seconds(10));
 			}
-			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 
 	} );
@@ -77,7 +76,8 @@ bool gps::server::tcpserver::listen()
 		tcp::socket _socket(_io_service);
 
 		_acceptor.accept(_socket); // Blocks here
-		while (!lock.try_lock());
+		while (!lock.try_lock())
+			;
 		connected = true;
 		lock.unlock();
 		t1.join();
