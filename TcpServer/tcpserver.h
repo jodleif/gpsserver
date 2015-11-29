@@ -1,11 +1,14 @@
 #pragma once
+#include <boost/config.hpp>
 #include <boost/asio.hpp>
-#include <thread>
 #include <mutex>
 #include <string>
-#include <cstdint>
 #include <deque>
 #include "uart/cppwrapper.h"
+#ifndef BOOST_NO_CXX11_EXTERN_TEMPLATE
+	extern template class boost::asio::basic_stream_socket<boost::asio::ip::tcp>;
+	extern template class boost::asio::basic_socket_acceptor<boost::asio::ip::tcp>;
+#endif
 namespace gps
 {
 	namespace server
@@ -13,6 +16,7 @@ namespace gps
 		// using
 		using boost::asio::ip::tcp;
 		using gps::c_link::uart_conn;
+
 
 		const std::string empty_queue ="Empty queue\n";
 		class tcpserver
