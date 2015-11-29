@@ -3,10 +3,6 @@
 #include <thread>
 #include <chrono>
 #include <cassert>
-#ifndef BOOST_NO_CXX11_EXTERN_TEMPLATE
-template class boost::asio::basic_stream_socket<boost::asio::ip::tcp>;
-template class boost::asio::basic_socket_acceptor<boost::asio::ip::tcp>;
-#endif
 
 std::string gps::server::tcpserver::read(tcp::socket& _socket)
 {
@@ -25,6 +21,29 @@ std::string gps::server::tcpserver::read(tcp::socket& _socket)
 	}
 	return result;
 }
+
+void gps::server::tcpserver::start_thread()
+{
+	t1 = std::thread( [this] {
+		std::string res;
+		for (;;) {
+			if (connected) break;
+			lock.lock();
+			res = gps_connection.read();
+			if (message_queue.size() <= 1024u) {
+				message_queue.push_back(res);
+				lock.unlock();
+			} else {
+				lock.unlock();
+				std::cout << "buffer full.. sleeeep\n";
+				std::this_thread::sleep_for(std::chrono::seconds(100));
+			}
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+
+	} );
+}
+
 /*
 
 */
@@ -43,6 +62,7 @@ void gps::server::tcpserver::sync()
 
 gps::server::tcpserver::tcpserver(const unsigned short portnum) : _portnum(portnum)
 {
+	start_thread();
 }
 
 gps::server::tcpserver::~tcpserver()
@@ -56,30 +76,11 @@ bool gps::server::tcpserver::listen()
 		tcp::acceptor _acceptor(_io_service, tcp::endpoint(tcp::v4(), _portnum));
 		tcp::socket _socket(_io_service);
 
-		std::thread t1{ [this] {
-			std::string res;
-			for (;;) {
-				if (connected) break;
-				lock.lock();
-				res = gps_connection.read();
-				if (message_queue.size() <= 1024u) {
-					message_queue.push_back(res);
-
-				lock.unlock();
-			} else {
-					std::cout << "buffer full.. sleeeep\n";
-					lock.unlock();
-					std::this_thread::sleep_for(std::chrono::seconds(100));
-				}
-				std::this_thread::sleep_for(std::chrono::seconds(1));
-			}
-
-		} };
 		_acceptor.accept(_socket); // Blocks here
 		while (!lock.try_lock());
 		connected = true;
-		t1.join();
 		lock.unlock();
+		t1.join();
 
 		for (;;) {
 			// READ DATA FROM GPS
