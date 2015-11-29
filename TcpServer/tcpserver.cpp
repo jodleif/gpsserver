@@ -78,7 +78,7 @@ bool gps::server::tcpserver::listen()
 			// Empty queue
 			while (!message_queue.empty()) {
 				auto msg = message_queue.front();
-				boost::asio::write(_socket, boost::asio::const_buffer(msg.data(), msg.length()));
+				boost::asio::write(_socket, boost::asio::buffer(msg.data(), msg.length()));
 				message_queue.pop_front();
 			}
 
