@@ -77,7 +77,7 @@ bool gps::server::tcpserver::listen()
 
 		_acceptor.accept(_socket); // Blocks here
 		while (!lock.try_lock())
-			;
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		connected = true;
 		lock.unlock();
 		t1.join();
