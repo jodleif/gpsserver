@@ -1,8 +1,11 @@
 #pragma once
-#include <boost/config.hpp>
-#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/basic_socket_acceptor.hpp>
+#include <boost/asio/basic_socket.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <deque>
 #include "uart/cppwrapper.h"
 
@@ -26,7 +29,7 @@ namespace gps
 			static const size_t max_length = 128;
 			const unsigned short _portnum;
 			bool connected = false;
-			std::string read(tcp::socket& _socket);
+			//std::string read(tcp::socket& _socket);
 			void start_thread();
 			void sync();
 		public:

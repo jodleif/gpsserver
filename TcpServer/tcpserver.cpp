@@ -1,9 +1,8 @@
 #include "tcpserver.h"
 #include <iostream>
-#include <thread>
 #include <chrono>
-#include <cassert>
-
+#include <boost/asio/write.hpp>
+/*
 std::string gps::server::tcpserver::read(tcp::socket& _socket)
 {
 	std::string result;
@@ -21,6 +20,7 @@ std::string gps::server::tcpserver::read(tcp::socket& _socket)
 	}
 	return result;
 }
+*/
 
 void gps::server::tcpserver::start_thread()
 {
