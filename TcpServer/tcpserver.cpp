@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <cassert>
-#ifndef BOOST_NO_CXX11_EXTERN TEMPLATE
+#ifndef BOOST_NO_CXX11_EXTERN_TEMPLATE
 template class boost::asio::basic_stream_socket<boost::asio::ip::tcp>;
 template class boost::asio::basic_socket_acceptor<boost::asio::ip::tcp>;
 #endif
