@@ -58,7 +58,7 @@ bool gps::server::tcpserver::listen()
 				if (connected) break;
 				lock.lock();
 				res = gps_connection.read();
-				if (message_queue.size() <= 1024u);
+				if (message_queue.size() <= 1024u)
 					message_queue.push_back(res);
 				lock.unlock();
 				std::this_thread::sleep_for(std::chrono::seconds(1));
