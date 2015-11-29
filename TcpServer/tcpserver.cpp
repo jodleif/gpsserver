@@ -9,9 +9,7 @@ std::string gps::server::tcpserver::read(tcp::socket& _socket)
 	std::string result;
 	char data[max_length];
 	boost::system::error_code error;
-	std::cout << "BLOCKING READ!!!!!\n";
 	size_t length = _socket.read_some(boost::asio::buffer(data), error);
-	std::cout << "BLOCKING READ!!!!! done\n";
 	if (error == boost::asio::error::eof)
 		return result;
 	if (error)
@@ -23,7 +21,9 @@ std::string gps::server::tcpserver::read(tcp::socket& _socket)
 	}
 	return result;
 }
+/*
 
+*/
 void gps::server::tcpserver::sync()
 {
 	std::string res;
@@ -43,7 +43,6 @@ gps::server::tcpserver::tcpserver(const unsigned short portnum) : _portnum(portn
 
 gps::server::tcpserver::~tcpserver()
 {
-
 }
 
 bool gps::server::tcpserver::listen()
@@ -52,27 +51,37 @@ bool gps::server::tcpserver::listen()
 
 		tcp::acceptor _acceptor(_io_service, tcp::endpoint(tcp::v4(), _portnum));
 		tcp::socket _socket(_io_service);
-		_acceptor.accept(_socket);
-		
-		//auto from_client = read(_socket);
-		//if (from_client != "OK") return false;
+		std::thread t1{[this]
+		{
+			std::string res;
+			for (;;) {
+				if (connected) break;
+				while (!lock.try_lock());
+				res = gps_connection.read();
+				if (message_queue.size() <= 1024u);
+					message_queue.push_back(res);
+				lock.unlock();
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+
+		} };
+		_acceptor.accept(_socket); // Blocks here
+		while (!lock.try_lock());
+		connected = true;
+		t1.join();
+		lock.unlock();
+
 		for (;;) {
 			// READ DATA FROM GPS
 			sync();
 			std::this_thread::sleep_for(std::chrono::seconds(5));
 			// Empty queue
-			if (!message_queue.empty()) {
-				while (!message_queue.empty()) {
-					auto msg = message_queue.front();
-					boost::asio::write(_socket, boost::asio::buffer(msg, msg.length()));
-					//auto from_client = read(_socket);
-					//std::cout << "Receiv: " << from_client << "\n";
-					//if (from_client != "OK") return false;
-					message_queue.pop_front();
-				}
-			} else {
-				boost::asio::write(_socket, boost::asio::buffer(empty_queue, empty_queue.length()));
+			while (!message_queue.empty()) {
+				auto msg = message_queue.front();
+				boost::asio::write(_socket, boost::asio::const_buffer(msg.data(), msg.length()));
+				message_queue.pop_front();
 			}
+
 		}
 	} catch (std::exception e) {
 		std::cout << "[listen] Error!\n" << e.what() << "\n";
